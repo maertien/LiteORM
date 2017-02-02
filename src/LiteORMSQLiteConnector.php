@@ -13,7 +13,7 @@ class LiteORMSQLiteConnector extends LiteORMBaseConnector {
 
 		if (is_null(self::$instance)) {
 
-			self::$instance = new LiteORMConnector(LITEORM_DB_FILE);
+			self::$instance = new LiteORMSQLiteConnector(LITEORM_DB_FILE);
 		}
 
 		return self::$instance;
