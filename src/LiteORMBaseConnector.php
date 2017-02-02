@@ -1,9 +1,9 @@
 <?php
 
 /**
- * LiteORMConnector
+ * LiteORMBaseConnector
  */
-class LiteORMConnector {
+abstract class LiteORMBaseConnector {
 	
 	private $pdo;
 	private $statement;
