@@ -201,7 +201,7 @@ abstract class LiteORMDataObject {
 	 */
 	public function createTable() {
 		$tableName = get_class($this);
-		$sql = "CREATE TABLE " . $tableName . " (id integer primary key autoincrement";
+		$sql = "CREATE TABLE IF NOT EXISTS " . $tableName . " (id integer primary key autoincrement";
 
 		foreach ($this->vals as $key => $value) {
 			

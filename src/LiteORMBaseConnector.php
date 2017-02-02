@@ -5,41 +5,12 @@
  */
 abstract class LiteORMBaseConnector {
 	
-	private $pdo;
-	private $statement;
-	private static $instance = null;
+	protected $pdo;
+	protected $statement;
+	protected static $instance = null;
 
-	/**
-	 * Returns singleton instance of LiteORMConnector
-	 * @return object LiteORMConnector instance
-	 */
-	public static function getInstance() {
-
-		if (is_null(self::$instance)) {
-
-			self::$instance = new LiteORMConnector(LITEORM_DB_FILE);
-		}
-
-		return self::$instance;
-	}
-
-
-	/**
-	 * Constructs a connection to the specified database file
-	 * @param string $file Filename containing DB
-	 */
-	public function __construct($file) {
-		
-		try {
-			
-			$this->pdo = new PDO("sqlite:" . $file);
-			$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		}
-		catch (Exception $e) {
-			
-			throw new LiteORMException("Unable to connect to or create database file", 1, $e);
-		}
-	}
+	public static abstract function getInstance();
+	public abstract function __construct($params);
 
 	/**
 	 * Prepare statement
