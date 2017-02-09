@@ -32,7 +32,7 @@ class LiteORMMySQLConnector extends LiteORMBaseConnector {
 
 		try {
 
-			$this->pdo = new PDO("mysql:host=" . $params["host"] . ";port=" . $params["port"]  . ";dbname=" . $params["dbname"], $params["user"], $params["password"]);
+			$this->pdo = new PDO("mysql:host=" . $params["host"] . ";port=" . $params["port"]  . ";dbname=" . $params["dbname"] . ";charset=utf8", $params["user"], $params["password"]);
 			$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		}
 		catch (Exception $e) {
