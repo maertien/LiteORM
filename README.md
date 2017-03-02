@@ -7,9 +7,14 @@ GNU GPL version 2
 ## Author
 Martin Kumst - http://kumst.net
 
-## Examples of LiteORM usages
+## Howto use LiteORM
 ```php
 <?php
 
-// TODO
+// In the file src/LiteORMConnector.php you can choose SQLite3 or MySQL connector by extending the class you want (LiteORMSQLiteConnector or LiteORMMySQLConnector) 
+
+// For SQLite3 connector you should write this:
+class LiteORMConnector extends LiteORMSQLiteConnector {
+};
+
 ```
