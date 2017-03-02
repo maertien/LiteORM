@@ -33,6 +33,33 @@ abstract class LiteORMDataObject {
 			;
 		}
 	}
+
+	/**
+	 * Get all instances by selector and compare by comparator 
+	 */
+	public static function getBySelector($selector, $comparator = null) {
+		
+		$result = array();
+
+		// Get all instances
+		$instances = self::getAll();
+
+		// Selector will decide which instance will be in the result
+		foreach ($instances as $instance) {
+
+			// Call selector
+			if ($selector($instance) === true) {
+				$result[] = $instance;
+			}
+		}
+
+		// Compare the result if there is any comparator
+		if ($comparator !== null) {
+			usort($result, $comparator);
+		}
+
+		return $result;
+	}
 	
 	/**
 	 * Get all instances
