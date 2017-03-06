@@ -130,7 +130,12 @@ abstract class LiteORMDataObject {
 		$this->connector->execute();
 		
 		$result = $this->connector->fetchAll();
-		
+
+		if (! isset($result[0])) {
+
+			throw new LiteORMException("There is no object with id " . $this->vals["id"], 3);
+		}
+
 		foreach ($result[0] as $columnName => $value) {
 			if (! isset($this->vals[$columnName])) {
 				$this->vals[$columnName] = $value;
@@ -255,8 +260,11 @@ abstract class LiteORMDataObject {
 	 * @return mixed Value
 	 */
 	public function get($name) {
+
+		$keys = array_keys($this->vals);
 		
-		if (isset($this->vals[$name])) {
+		if (in_array($name, $keys, true) === true) {
+
 			return $this->vals[$name];
 		}
 		else {
