@@ -6,10 +6,3 @@
 class LiteORMConnector extends LiteORMSQLiteConnector {
 
 }
-
-/**
- * LiteORMConnector - MySQL VERSION
- */
-//class LiteORMConnector extends LiteORMMySQLConnector {
-//
-//}
