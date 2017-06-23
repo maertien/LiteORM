@@ -23,9 +23,11 @@ abstract class LiteORMDataObject {
 		$this->connector = LiteORMConnector::getInstance();
 		
 		if (is_array($vals)) {
+
 			$this->vals = $vals;
 		}
 		elseif (is_numeric($vals)) {
+
 			$this->vals["id"] = $vals;
 			$this->load();
 		}
@@ -49,12 +51,14 @@ abstract class LiteORMDataObject {
 
 			// Call selector
 			if ($selector($instance) === true) {
+
 				$result[] = $instance;
 			}
 		}
 
 		// Compare the result if there is any comparator
 		if ($comparator !== null) {
+
 			usort($result, $comparator);
 		}
 
@@ -76,6 +80,7 @@ abstract class LiteORMDataObject {
 		$connector->execute();
 		$ids = $connector->fetchAll(); 
 		foreach ($ids as $id) {
+
 			$result[] = new $tableName($id["id"], $connector);
 		}
 		
@@ -105,6 +110,7 @@ abstract class LiteORMDataObject {
 		
 		$connector->prepare($sql);
 		foreach ($conds as $key => $val) {
+
 			$connector->bindVal(":" . $key, $val);
 		}
 		$connector->execute();
@@ -123,6 +129,7 @@ abstract class LiteORMDataObject {
 	 * Load object data from database
 	 */
 	private function load() {
+
 		$tableName = get_class($this);
 		$sql = "select * from " . $tableName . " where id = :id";
 		$this->connector->prepare($sql);
@@ -137,7 +144,9 @@ abstract class LiteORMDataObject {
 		}
 
 		foreach ($result[0] as $columnName => $value) {
+
 			if (! isset($this->vals[$columnName])) {
+
 				$this->vals[$columnName] = $value;
 			}
 		}
@@ -147,6 +156,7 @@ abstract class LiteORMDataObject {
 	 * Delete object
 	 */
 	public function delete() {
+
 		$tableName = get_class($this);
 		$sql = "delete from " . $tableName . " where id = :id";
 		$this->connector->prepare($sql);
@@ -158,6 +168,7 @@ abstract class LiteORMDataObject {
 	 * Delete all objects
 	 */
 	public function deleteAll() {
+
 		$tableName = get_class($this);
 		$this->connector->prepare("delete from " . $tableName);
 		$this->connector->execute();
@@ -167,6 +178,7 @@ abstract class LiteORMDataObject {
 	 * Save object into database
 	 */
 	public function save() {
+
 		$tableName = get_class($this);
 		
 		if (! isset($this->vals["id"])) {
@@ -232,6 +244,7 @@ abstract class LiteORMDataObject {
 	 * Create table with the structure based on object values
 	 */
 	public function createTable() {
+
 		$tableName = get_class($this);
 		$sql = "CREATE TABLE IF NOT EXISTS " . $tableName . " (id integer primary key autoincrement";
 
@@ -239,12 +252,15 @@ abstract class LiteORMDataObject {
 			
 			$type = "text";
 			switch (gettype($value)) {
+
 				case "integer":
 					$type = "integer";
 					break;
+
 				default:
 					$type = "text";
 			}
+
 			$sql .= ", " . $key . " " . $type;
 		}
 
@@ -279,6 +295,7 @@ abstract class LiteORMDataObject {
 	 * @param mixed $value Value
 	 */
 	public function set($name, $value) {		
+
 		$this->vals[$name] = $value;
 	}
 }
