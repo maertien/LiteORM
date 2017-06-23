@@ -29,5 +29,9 @@ $man->save();
 // Get some property value
 echo $man->get("age");
 
+// Modify and save object
+$man->set("age", 22);
+$man->save();
+
 // For more examples please take a look at tests/test_sqlite.php file
 ```
