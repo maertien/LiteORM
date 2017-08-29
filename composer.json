@@ -1,6 +1,7 @@
 {
 	"name": "maertien/liteorm",
-	"description": "Simple PHP ORM framework for SQLite3",
+	"description": "Lightweight, really simple and easy to use PHP ORM for SQLite3",
+	"license": "GNU GPL version 2",
 	"require": {
 		"php": ">=5.3.4"
 	}
