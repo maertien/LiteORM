@@ -4,6 +4,23 @@ require_once "../src/LiteORM.php";
 
 define("LITEORM_DB_FILE", "./test.sqlite");
 
+class A {
+	private $a;
+	private $b;
+}
+
+$r = new LiteORMReflector(new A());
+var_dump($r->getAllVariables());
+die();
+
+
+$em = new LiteORMEntityManager();
+
+var_dump($em->getAll('A'));
+
+die("KONEC\n");
+
+
 // Delete test db file if it exists
 if (file_exists(LITEORM_DB_FILE)) {
 	unlink(LITEORM_DB_FILE);
