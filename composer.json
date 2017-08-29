@@ -1,5 +1,5 @@
 {
-	"name": "maertien/LiteORM",
+	"name": "maertien/liteorm",
 	"description": "Simple PHP ORM framework for SQLite3",
 	"require": {
 		"php": ">=5.3.4"
