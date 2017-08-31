@@ -22,9 +22,9 @@ class LiteORMEntityManager {
 	 */
 	public function find($entityType, $conditions) {
 
-		$this->validateEntityType();
+		$this->validateEntityType($entityType);
 
-		if (is_numeric($conditions) == true) {
+		if (is_numeric($conditions) === true) {
 
 			return $this->getInstanceById($entityType, $conditions);
 		}
@@ -52,16 +52,34 @@ class LiteORMEntityManager {
 		$ids = $this->connector->fetchAll(); 
 		foreach ($ids as $id) {
 
-			$result[] = $id["id"];
+			$result[] = $this->getInstanceById($entityType, $id["id"]);
 		}
 		
 		return $result;
 	}
 
+	/**
+	 * Get all entities (alias for getAll method)
+	 * @param string $entityType Entity type
+	 * @return array Array of entities
+	 */
+	public function findAll($entityType) {
+
+		return $this->getAll($entityType);
+	}
+
+	/**
+	 * Delete entity
+	 * @param object $entity Entity
+	 */
 	public function delete($entity) {
 
 	}
 
+	/**
+	 * Save entity
+	 * @param object $entity Entity
+	 */
 	public function save($entity) {
 
 	}
@@ -89,8 +107,29 @@ class LiteORMEntityManager {
 	 */
 	private function getInstanceById($entityType, $id) {
 
+		$this->validateEntityType($entityType);
+
+		$entity = new $entityType();
+		$reflector = new LiteORMReflector($entity);
+
+		$sql = "select * from " . $entityType . " where id = :id";
+		$this->connector->prepare($sql);
+		$this->connector->bindVal(":id", $id);
+		$this->connector->execute();
+		
+		$result = $this->connector->fetchAll();
+
+		if (! isset($result[0])) {
+
+			throw new LiteORMException("There is no object with id " . $this->vals["id"]);
+		}
+
+		foreach ($result[0] as $columnName => $value) {
+
+			$reflector->setVariable($columnName, $value);
+		}
+
+		return $entity;
 	}
 }
 
-class LiteORM extends LiteORMEntityManager {
-}

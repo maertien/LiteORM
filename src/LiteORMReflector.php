@@ -27,18 +27,42 @@ class LiteORMReflector {
 
 	/**
 	 * Get all source object variables
+	 * @return array Variable names
 	 */
 	public function getAllVariables() {
 
-		$result = $this->reflector->getProperties();
+		$variables = $this->reflector->getProperties();
+		$result = array();
+
+		foreach ($variables as $variable) {
+
+			$result[] = $variable->getName();
+		}
+
 		return $result;
 	}
 
+	/**
+	 * Set variable 
+	 * @param string $name Name of variable
+	 * @param mixed $value Value of variable
+	 */
 	public function setVariable($name, $value) {
 
+		$property = $this->reflector->getProperty($name);
+		$property->setAccessible(true);
+		$property->setValue($this->src, $value);
 	}
 
+	/**
+	 * Get variable value
+	 * @param string $name Name of variable
+	 * @return mixed Variable value
+	 */
 	public function getVariable($name) {
 
+		$property = $this->reflector->getProperty($name);
+		$property->setAccessible(true);
+		return $property->getValue($this->src);
 	}
 }
