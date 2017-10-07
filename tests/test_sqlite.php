@@ -9,9 +9,15 @@ class A {
 	private $b;
 }
 
+
+$r = new LiteORMTableGenerator();
+$r->generate('A');
+die();
+
+
+
 $r = new LiteORMReflector(new A());
 var_dump($r->getAllVariables());
-die();
 
 
 $em = new LiteORMEntityManager();

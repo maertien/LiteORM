@@ -22,16 +22,44 @@ class LiteORMEntityManager {
 	 */
 	public function find($entityType, $conditions) {
 
-		$this->validateEntityType($entityType);
+		LiteORMValidationHelper::isEntityTypeValid($entityType);
 
 		if (is_numeric($conditions) === true) {
 
 			return $this->getInstanceById($entityType, $conditions);
 		}
+		
 	}
 
+	/**
+	 * Get all entities by selector and compare by comparator
+	 * @param string $entityType Entity type
+	 * @param mixed $selector Selector function
+	 * @param mixed $comparator Comparator function
+	 */
 	public function getBySelector($entityType, $selector, $comparator = null) {
 
+		LiteORMValidationHelper::isEntityTypeValid($entityType);
+
+		$entities = $this->getAll($entityType);
+
+		// Fire selector method on each entity
+		$result = array();
+		foreach ($entities as $entity) {
+
+			if ($selector($entity) === true) {
+
+				$result[] = $entity;
+			}			
+		}
+
+		// Compare the result
+		if ($comparator !== null) {
+
+			usort($result, $comparator);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -41,7 +69,7 @@ class LiteORMEntityManager {
 	 */
 	public function getAll($entityType) {
 
-		$this->validateEntityType($entityType);
+		LiteORMValidationHelper::isEntityTypeValid($entityType);
 		
 		$result = array();
 		
@@ -74,6 +102,14 @@ class LiteORMEntityManager {
 	 */
 	public function delete($entity) {
 
+		$reflector = new LiteORMReflector($entity);
+		$id = $reflector->getVariable("id");
+		$tableName = get_class($entity);
+
+		$sql = "delete from " . $tableName . " where id = :id";
+		$this->connector->prepare($sql);
+		$this->connector->bindVal(":id", $id);
+		$this->connector->execute();
 	}
 
 	/**
@@ -85,29 +121,13 @@ class LiteORMEntityManager {
 	}
 
 	/**
-	 * Validate entity type
-	 * @param string $entityType Entity type
-	 * @return bool True if entity type is valid
-	 * @throws Exception
-	 */
-	private function validateEntityType($entityType) {
-
-		if (class_exists($entityType) !== true) {
-
-			throw new LiteORMException("Entity type " . $entityType . " is invalid");
-		}
-
-		return true;
-	}
-
-	/**
 	 * Get entity by id 
 	 * @param string $entityType Entity type
 	 * @param int $id Entity id
 	 */
 	private function getInstanceById($entityType, $id) {
 
-		$this->validateEntityType($entityType);
+		LiteORMValidationHelper::isEntityTypeValid($entityType);
 
 		$entity = new $entityType();
 		$reflector = new LiteORMReflector($entity);
