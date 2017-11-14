@@ -30,6 +30,11 @@ class LiteORMTableGenerator {
 
 		foreach ($variables as $variable) {
 
+			if ($variable === "id" || $variable === "ID") {
+
+				continue;
+			}
+
 			$sql .= ", " . $variable . " " . "text";
 		}
 

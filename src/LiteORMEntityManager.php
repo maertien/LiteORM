@@ -118,6 +118,104 @@ class LiteORMEntityManager {
 	 */
 	public function save($entity) {
 
+		$reflector = new LiteOrmReflector($entity);
+		$id = $reflector->getVariable("id");
+		$tableName = get_class($entity);
+		
+		if (is_numeric($id) === false) {
+			// No id set, insert
+			return $this->insert($entity);
+		}
+		else {
+			// Id is set, update
+			return $this->update($entity);
+		}
+	}
+
+	/**
+	 * Insert new entity into database
+	 * @param object $entity Entity
+	 */
+	private function insert($entity) {
+
+		$tableName = get_class($entity);
+		$reflector = new LiteORMReflector($entity);
+		$variables = $reflector->getAllVariables();
+
+		foreach ($variables as $key => $var) {
+
+			if ($var === "id") {
+
+				unset($variables[$key]);
+			}
+		}		
+
+
+		$valsDB = array();
+		foreach ($variables as $varName) {
+
+			if ($varName === "id") {
+
+				continue;
+			}
+
+			$valsDB[] = ":" . $varName;
+		}
+
+		$sql = "insert into " . $tableName . " (id, ";
+		$sql .= implode(", ", $variables);
+		$sql .= ") values(null, ";
+		$sql .= implode(", ", $valsDB);
+		$sql .= ");";
+
+		$this->connector->begin();
+		$this->connector->prepare($sql);
+		foreach ($variables as $varName) {
+			$this->connector->bindVal(":" . $varName, $reflector->getVariable($varName));
+		}
+		$this->connector->execute();
+		$newID = $this->connector->getLastID();
+		$this->connector->commit();
+
+		$reflector->setVariable("id", $newID);
+
+		return $newID;
+	}
+
+	/**
+	 * Update existing entity in database
+	 * @param object $entity Entity
+	 */
+	private function update($entity) {
+
+		$tableName = get_class($entity);
+		$reflector = new LiteORMReflector($entity);		
+		$variables = $reflector->getAllVariables();
+
+		$sql = "update " . $tableName . " set ";
+
+		$updateParams = array();
+		foreach ($variables as $varName) {
+
+			if ($varName === "id") {
+
+				continue;
+			}
+
+			$updateParams[] = $varName . " = :" . $varName;
+		}
+
+		$sql .= implode(", ", $updateParams);
+		$sql .= " where id = :id";
+
+		$this->connector->prepare($sql);
+
+		foreach ($variables as $varName) {
+
+			$this->connector->bindVal(":" . $varName, $reflector->getVariable($varName));
+		}
+		
+		$this->connector->execute();
 	}
 
 	/**
@@ -141,7 +239,7 @@ class LiteORMEntityManager {
 
 		if (! isset($result[0])) {
 
-			throw new LiteORMException("There is no object with id " . $this->vals["id"]);
+			throw new LiteORMException("There is no object with id " . $id);
 		}
 
 		foreach ($result[0] as $columnName => $value) {

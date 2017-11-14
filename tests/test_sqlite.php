@@ -5,13 +5,40 @@ require_once "../src/LiteORM.php";
 define("LITEORM_DB_FILE", "./test.sqlite");
 
 class A {
+	private $id;
+
 	private $a;
 	private $b;
+
+	public function setA($a) {
+		$this->a = $a;
+	}
+
+	public function setB($b) {
+		$this->b = $b;
+	}
 }
 
 
 $r = new LiteORMTableGenerator();
 $r->generate('A');
+
+$em = new LiteORMEntityManager();
+$a = new A();
+$a->setA("A");
+$a->setB("B");
+$newID = $em->save($a);
+var_dump($newID);
+$n = $em->find('A', $newID);
+var_dump($n);
+$n->setB("BBBBB");
+$em->save($n);
+$nn = $em->find("A", $newID);
+var_dump($nn);
+$em->delete($nn);
+$nnn = $em->find("A", $newID);
+var_dump($nnn);
+
 die();
 
 
