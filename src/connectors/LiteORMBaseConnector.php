@@ -68,6 +68,14 @@ abstract class LiteORMBaseConnector {
 	public function commit() {
 		return $this->pdo->commit();
 	}
+
+	/**
+	 * Rollback DB transaction
+	 */
+	public function rollback() {
+
+		return $this->pdo->rollBack();
+	}
 	
 	/**
 	 * Get last inserted ID

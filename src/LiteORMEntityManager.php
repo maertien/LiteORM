@@ -133,6 +133,30 @@ class LiteORMEntityManager {
 	}
 
 	/**
+	 * Begin transaction
+	 */
+	public function beginTransaction() {
+
+		$this->connector->begin();
+	}
+
+	/**
+	 * Commit transaction
+	 */
+	public function commitTransaction() {
+
+		$this->connector->commit();
+	}
+
+	/**
+	 * Rollback transaction
+	 */
+	public function rollbackTransaction() {
+
+		$this->connector->rollback();
+	}
+
+	/**
 	 * Insert new entity into database
 	 * @param object $entity Entity
 	 */
@@ -239,7 +263,8 @@ class LiteORMEntityManager {
 
 		if (! isset($result[0])) {
 
-			throw new LiteORMException("There is no object with id " . $id);
+			// throw new LiteORMException("There is no object with id " . $id);
+			return null;
 		}
 
 		foreach ($result[0] as $columnName => $value) {

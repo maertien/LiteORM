@@ -17,6 +17,10 @@ class E {
 	public function setA($a) {
 		$this->a = $a;
 	}
+
+	public function getId() {
+		return $this->id;
+	}
 }
 
 // Generate table structure
@@ -80,9 +84,34 @@ catch (Exception $e) {
 
 // Delete entity
 try {
+	$id = $ee->getId();	
 	$em = new LiteORMEntityManager();
 	$em->delete($ee);
 	echo "Entity should be deleted\n";	
+	$eee = $em->find("E", $id);
+	if ($eee === null) {
+		echo "Entity does not exists - OK\n";
+	}
+	else {
+		echo "Entity exists - BAD\n";
+	}
+}
+catch (Exception $e) {
+	echo "ERROR: " . $e->getMessage() . "\n";
+}
+
+// Benchmark
+try {
+	$start = microtime(true);
+	$em = new LiteORMEntityManager();
+	for($i = 0; $i < 100; $i++) {
+		$e = new E();
+		$e->setA("element " . $i);
+		$em->save($e);
+	}
+	$stop = microtime(true);
+	$elapsed = sprintf("%.2f", $stop - $start);
+	echo "Benchmark: " . $elapsed . " s\n";
 }
 catch (Exception $e) {
 	echo "ERROR: " . $e->getMessage() . "\n";
