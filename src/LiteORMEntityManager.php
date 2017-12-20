@@ -24,11 +24,16 @@ class LiteORMEntityManager {
 
 		LiteORMValidationHelper::isEntityTypeValid($entityType);
 
+		// Numeric conditions means get instance by id
 		if (is_numeric($conditions) === true) {
 
 			return $this->getInstanceById($entityType, $conditions);
 		}
-		
+		elseif (is_array($conditions) === true) { // Array with conditions
+
+			
+
+		}
 	}
 
 	/**
@@ -192,14 +197,14 @@ class LiteORMEntityManager {
 		$sql .= implode(", ", $valsDB);
 		$sql .= ");";
 
-		$this->connector->begin();
+		// $this->connector->begin();
 		$this->connector->prepare($sql);
 		foreach ($variables as $varName) {
 			$this->connector->bindVal(":" . $varName, $reflector->getVariable($varName));
 		}
 		$this->connector->execute();
 		$newID = $this->connector->getLastID();
-		$this->connector->commit();
+		// $this->connector->commit();
 
 		$reflector->setVariable("id", $newID);
 

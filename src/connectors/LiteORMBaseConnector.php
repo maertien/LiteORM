@@ -8,6 +8,7 @@ abstract class LiteORMBaseConnector {
 	protected $pdo;
 	protected $statement;
 	protected static $instance = null;
+	protected $transactionInProgress = false;
 
 	public static abstract function getInstance();
 	public abstract function __construct($params);
@@ -52,6 +53,7 @@ abstract class LiteORMBaseConnector {
 	 * @return mixed Data
 	 */
 	public function fetchAll() {
+
 		return $this->statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 	
@@ -59,14 +61,22 @@ abstract class LiteORMBaseConnector {
 	 * Begin DB transaction
 	 */
 	public function begin() {
-		return $this->pdo->beginTransaction();
+
+		if ($this->pdo->inTransaction() !== true) {
+
+			return $this->pdo->beginTransaction();
+		}
 	}
 	
 	/**
 	 * Commit DB transaction
 	 */
 	public function commit() {
-		return $this->pdo->commit();
+
+		if ($this->pdo->inTransaction() === true) {
+
+			return $this->pdo->commit();
+		}
 	}
 
 	/**
@@ -74,7 +84,10 @@ abstract class LiteORMBaseConnector {
 	 */
 	public function rollback() {
 
-		return $this->pdo->rollBack();
+		if ($this->pdo->inTransaction() === true) {
+	
+			return $this->pdo->rollBack();
+		}
 	}
 	
 	/**

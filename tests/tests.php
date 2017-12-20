@@ -3,6 +3,12 @@
 require_once "../src/LiteORM.php";
 define("LITEORM_DB_FILE", "./test.sqlite");
 
+// Remove test file if exists
+if (file_exists(LITEORM_DB_FILE) === true) {
+
+	unlink(LITEORM_DB_FILE);
+}
+
 // Test LiteORM
 
 // Entity class
@@ -102,6 +108,7 @@ catch (Exception $e) {
 
 // Benchmark
 try {
+	echo "Benchmark started\n";
 	$start = microtime(true);
 	$em = new LiteORMEntityManager();
 	for($i = 0; $i < 100; $i++) {
@@ -114,5 +121,42 @@ try {
 	echo "Benchmark: " . $elapsed . " s\n";
 }
 catch (Exception $e) {
+	echo "ERROR: " . $e->getMessage() . "\n";
+}
+
+// Transactions
+try {
+	echo "Testing insert with transaction ... ";
+	$em = new LiteORMEntityManager();
+	$e = new E();
+	$e->setA("Testing entity");
+	$em->beginTransaction();
+	$em->save($e);
+	$em->commitTransaction();
+	echo "OK\n";
+}
+catch (Exception $e) {
+	$em->rollbackTransaction();
+	echo "ERROR: " . $e->getMessage() . "\n";
+}
+
+// Benchmark with transaction
+try {
+	echo "Benchmark using just one transaction\n";
+	$start = microtime(true);
+	$em = new LiteORMEntityManager();
+	$em->beginTransaction();
+	for($i = 0; $i < 100; $i++) {
+		$e = new E();
+		$e->setA("element " . $i);
+		$em->save($e);
+	}
+	$em->commitTransaction();
+	$stop = microtime(true);
+	$elapsed = sprintf("%.2f", $stop - $start);
+	echo "Benchmark: " . $elapsed . " s\n";
+}
+catch (Exception $e) {
+	$em->rollbackTransaction();
 	echo "ERROR: " . $e->getMessage() . "\n";
 }
