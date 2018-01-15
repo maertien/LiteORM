@@ -160,3 +160,30 @@ catch (Exception $e) {
 	$em->rollbackTransaction();
 	echo "ERROR: " . $e->getMessage() . "\n";
 }
+
+// Find by conditons
+try {
+	echo "Testing selection with conditions\n";
+	$em = new LiteORMEntityManager();
+
+	$ids = array();
+	$es = array();
+	for ($i = 0; $i < 5; $i++) {
+		$e = new E();
+		$e->setA($i);
+		$ids[] = $em->save($e);
+		$es[] = $e;
+	}
+
+	$idBinds = array(":id1" => $ids[0], ":id2" => $ids[1], ":id3" => $ids[2]);
+	$recs = $em->find("E", array("id IN(:id1, :id2, :id3)"), $idBinds);
+	if ($es[0] == $recs[0] && $es[1] == $recs[1] && $es[2] == $recs[2]) {
+		echo "OK\n";
+	}
+	else {
+		throw new Exception("Resultset contains invalid data");
+	}
+}
+catch (Exception $e) {
+	echo "ERROR: " . $e->getMessage() . "\n";
+}

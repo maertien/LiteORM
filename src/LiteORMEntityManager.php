@@ -18,9 +18,10 @@ class LiteORMEntityManager {
 	/**
 	 * Find entities by conditions
 	 * @param string $entityType Entity type
-	 * @param mixed $conditions Conditions
+	 * @param mixed $conditions Conditions (array) or id (numeric)
+	 * @param array $binds Binded values
 	 */
-	public function find($entityType, $conditions) {
+	public function find($entityType, $conditions, $binds = null) {
 
 		LiteORMValidationHelper::isEntityTypeValid($entityType);
 
@@ -31,8 +32,7 @@ class LiteORMEntityManager {
 		}
 		elseif (is_array($conditions) === true) { // Array with conditions
 
-			
-
+			return $this->getInstancesByConditions($entityType, $conditions, $binds);
 		}
 	}
 
@@ -278,6 +278,65 @@ class LiteORMEntityManager {
 		}
 
 		return $entity;
+	}
+
+	/**
+	 * Select instances by conditions
+	 * @param string $entityType Entity type
+	 * @param array $conditions Conditions
+	 * @param array $binds Binded values
+	 */
+	private function getInstancesByConditions($entityType, $conditions, $binds) {
+
+		LiteORMValidationHelper::isEntityTypeValid($entityType);
+
+		if (is_array($conditions) !== true) {
+
+			throw new LiteORMException("Invalid conditions");
+		}
+
+		if (is_array($binds) !== true) {
+
+			throw new LiteORMException("Invalid binds");
+		}
+
+		if (count($conditions) === 0) {
+			
+			throw new LiteORMException("There is no condition");
+		}
+
+		$sql = "select * from " . $entityType . " where " . implode(" and ", $conditions);
+		$this->connector->prepare($sql);
+	
+		foreach ($binds as $bindName => $bindVal) {
+
+			$this->connector->bindVal($bindName, $bindVal);
+		}
+
+		$this->connector->execute();
+		$result = $this->connector->fetchAll();
+
+		if (! isset($result[0])) {
+
+			return null;
+		}
+
+		$resultItems = array();
+
+		foreach ($result as $resItem) {
+
+			$entity = new $entityType();
+			$reflector = new LiteORMReflector($entity);
+
+			foreach ($resItem as $columnName => $value) {
+
+				$reflector->setVariable($columnName, $value);
+			}
+
+			$resultItems[] = $entity;
+		}
+
+		return $resultItems;
 	}
 }
 
